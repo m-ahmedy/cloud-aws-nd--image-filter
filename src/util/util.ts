@@ -2,6 +2,19 @@ import fs from 'fs';
 import path from 'path';
 import Jimp = require('jimp');
 
+// validate_URL
+// helper function to validate that the given string is a valid to image URL 
+export function validate_URL(url: string): boolean {
+    const pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '\\.(gif|jpe?g|tiff?|png|webp|bmp)' + // image file extension
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+    return !!pattern.test(url);
+}
+
 // filterImageFromURL
 // helper function to download, filter, and save the filtered image locally
 // returns the absolute path to the local image

@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { filterImageFromURL, deleteLocalFiles } from './util/util';
+import { StatusCodes } from 'http-status-codes';
+import { filterImageFromURL, deleteLocalFiles, validate_URL } from './util/util';
 
 (async () => {
 
@@ -28,13 +29,16 @@ import { filterImageFromURL, deleteLocalFiles } from './util/util';
 
   /**************************************************************************** */
   app.get('/filteredimage', async (req: express.Request, res: express.Response) => {
-    const image_url = req.query.image_url
-    if (!image_url) {
-      res.status(400).send("image_url query does not exist")
+    if (!req.query || !req.query.image_url) {
+      return res.status(StatusCodes.BAD_REQUEST).send("image_url query does not exist")
+    }
+
+    const image_url: string = req.query.image_url
+    if (!validate_URL(image_url)) {
+      return res.status(StatusCodes.BAD_REQUEST).send("image_url is not a valid image URL")
     }
 
     const image_file = await filterImageFromURL(image_url)
-
     res.sendFile(image_file)
 
     res.on('finish', () => {
